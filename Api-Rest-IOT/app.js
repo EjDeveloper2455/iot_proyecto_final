@@ -1,33 +1,32 @@
+
+const { json } = require('express');
+const express = require('express');
 const mqtt = require('mqtt');
+const app = express();
+const port = 8080;
 
-// Configura la conexión MQTT
-const brokerUrl = 'mqtt://34.125.241.7';  // Reemplaza con la URL de tu broker MQTT
-const client = mqtt.connect(brokerUrl);
+app.use(express.json());
+// Configura el cliente MQTT para tu servidor Node.js
+const mqttServerUrl = 'mqtt://127.0.0.1';  // Reemplaza con la URL de tu servidor MQTT
+const mqttClient = mqtt.connect(mqttServerUrl);
 
-// Manejadores de eventos
-client.on('connect', () => {
-    console.log('Conectado al broker MQTT');
+// Manejador de ruta para recibir mensajes MQTT y responder con Express
+app.post('/mqtt', (req, res) => {
 
-    // Publica un mensaje en un topic específico
-    const topic = 'IOTPF';
-    const message = 'Hola desde MQTT Node.js';
-
-    client.publish(topic, message, (err) => {
+    const {topic,payload} = req.body;
+    // Publica el mensaje MQTT
+    mqttClient.publish(topic, payload, (err) => {
         if (err) {
-            console.error('Error al publicar el mensaje:', err);
+            console.error('Error al publicar el mensaje MQTT:', err);
+            res.status(500).send('Error al publicar el mensaje MQTT');
         } else {
-            console.log('Mensaje publicado correctamente');
+            console.log('Mensaje MQTT publicado correctamente');
+            res.status(200).send('Mensaje MQTT publicado correctamente');
         }
-
-        // Cierra la conexión después de publicar el mensaje
-        client.end();
     });
 });
 
-client.on('error', (err) => {
-    console.error('Error de conexión al broker MQTT:', err);
-});
-
-client.on('close', () => {
-    console.log('Conexión cerrada');
+// Inicia el servidor Express
+app.listen(port, () => {
+    console.log(`Servidor Node.js escuchando en el puerto ${port}`);
 });
