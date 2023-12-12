@@ -1,16 +1,20 @@
 
-const { json } = require('express');
 const express = require('express');
+const auth = require('./auth');
 const mqtt = require('mqtt');
+
 const app = express();
 const port = 8080;
 
 app.use(express.json());
 // Configura el cliente MQTT para tu servidor Node.js
-const mqttServerUrl = 'mqtt://127.0.0.1';  // Reemplaza con la URL de tu servidor MQTT
+const mqttServerUrl = 'mqtt://34.125.241.7';  // Reemplaza con la URL de tu servidor MQTT
 const mqttClient = mqtt.connect(mqttServerUrl);
 
 // Manejador de ruta para recibir mensajes MQTT y responder con Express
+app.post('/user/login/', auth.login);
+app.post('/user/signup/', auth.signUp);
+app.post('/verificar/', auth.verificar);
 app.post('/mqtt', (req, res) => {
 
     const {topic,payload} = req.body;
