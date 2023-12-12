@@ -115,6 +115,6 @@ exports.verificar = async(req, res) =>{
         
     }catch(err){
         console.log(err);
-        res.send("login: Hubo un error: " + err);
+        res.send(" Hubo un error: " + err);
     }
 };
